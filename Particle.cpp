@@ -8,15 +8,13 @@ Particle::Particle(
     sf::Vector2f velocity,
     float mass,
     sf::Vector2f acceleration,
-    std::size_t particleVertexCount,
-    std::size_t colliderVertexCount
-) : velocity{ velocity }, mass{ mass }, acceleration{ acceleration }, shape{ this->calculateRadius(mass), particleVertexCount }, collider{ this->calculateRadius(mass), colliderVertexCount }
+    std::size_t particleVertexCount
+) : velocity{ velocity }, mass{ mass }, acceleration{ acceleration }, shape{ this->calculateRadius(mass), particleVertexCount }
 {
     const float r = this->calculateRadius(mass);
     this->shape.setOrigin({ r, r });
     
     this->shape.setPosition(position);
-    this->collider.setPosition(position);
 
     this->shape.setFillColor(sf::Color::White);
 };
@@ -60,6 +58,11 @@ sf::Vector2f Particle::getAcceleration() const
     return this->acceleration;
 }
 
+sf::Vector2f Particle::getCenter() const
+{
+    return this->shape.getTransform().transformPoint(this->shape.getOrigin());
+}
+
 void Particle::setVelocity(sf::Vector2f newVelocity)
 {
     this->velocity = newVelocity;
@@ -77,8 +80,6 @@ void Particle::setMass(float newMass)
 
     this->shape.setRadius(newRadius);
     this->shape.setOrigin({ newRadius, newRadius });
-
-    this->collider.setRadius(newRadius);
 }
 
 void Particle::setAcceleration(sf::Vector2f newAcceleration)
@@ -89,11 +90,6 @@ void Particle::setAcceleration(sf::Vector2f newAcceleration)
 void Particle::setParticleVertexCount(const std::size_t newCount)
 {
     this->shape.setPointCount(newCount);
-}
-
-void Particle::setColliderVertexCount(const std::size_t newCount)
-{
-    this->collider.setVertexCount(newCount);
 }
 
 void Particle::move(sf::Time deltaTime)
@@ -107,7 +103,6 @@ void Particle::move(sf::Time deltaTime)
 
     // set new position
     this->shape.setPosition(newPosition);
-    this->collider.setPosition(newPosition);
 
     // reset acceleration to 0
     this->acceleration = { 0.f, 0.f };
@@ -115,7 +110,12 @@ void Particle::move(sf::Time deltaTime)
 
 bool Particle::intersects(const Particle& other) const
 {
-    //sf::FloatRect boundingBox = this->shape.getGlobalBounds();
-    //return boundingBox.intersects(other.shape.getGlobalBounds());
-    return this->collider.intersects(other.collider);
+    sf::Vector2f center1 = this->getCenter();
+    sf::Vector2f center2 = other.getCenter();
+
+    float diffY = center2.y - center1.y;
+    float diffX = center2.x - center1.x;
+    float magnitude = std::sqrtf(diffY * diffY + diffX * diffX);
+
+    return (magnitude <= this->shape.getRadius() + other.shape.getRadius());
 }

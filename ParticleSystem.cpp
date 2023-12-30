@@ -1,7 +1,7 @@
 #include "ParticleSystem.h"
 
 ParticleSystem::ParticleSystem()
-    : particles{}, particlesVertexCount{ 30 }, collidersVertexCount{ 30 } {}
+    : particles{}, particlesVertexCount{ 30 } {}
 
 void ParticleSystem::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -29,13 +29,6 @@ void ParticleSystem::setParticlesVertexCount(const std::size_t newCount)
         particle.setParticleVertexCount(newCount);
 }
 
-void ParticleSystem::setCollidersVertexCount(const std::size_t newCount)
-{
-    this->collidersVertexCount = newCount;
-    for (auto& particle : this->particles)
-        particle.setColliderVertexCount(newCount);
-}
-
 void ParticleSystem::distributeParticles(const std::size_t particleCount, const float maxRadius)
 {
     const float PI = 3.14159265f;
@@ -48,7 +41,7 @@ void ParticleSystem::distributeParticles(const std::size_t particleCount, const 
         float radius = randFloat() * maxRadius;
 
         sf::Vector2f pos{ cos * radius, sin * radius };
-        sf::Vector2f vel{ sin, -cos };
+        sf::Vector2f vel{ sin , -cos };
 
         this->particles.push_back({ pos, vel, 3.f });
     }
@@ -68,25 +61,16 @@ void ParticleSystem::distributeParticles(const std::size_t particleCount, const 
     }*/
 }
 
-//void ParticleSystem::addParticle()
-//{
-//    sf::Vector2f velocity{ std::rand() % 10 / 10.f, std::rand() % 10 / 10.f };
-//    sf::Vector2f position{ std::rand() % 100 + 450.f, std::rand() % 100 + 200.f };
-//    float mass = std::rand() % 100 / 10.f;
-//
-//    this->particles.push_back({ position, velocity, mass, this->particlesVertexCount, this->collidersVertexCount });
-//}
-
 void ParticleSystem::addParticle(sf::Vector2f position, float mass, sf::Vector2f acceleration)
 {
     // TODO: get rid of magic values
     sf::Vector2f velocity{ (std::rand() % 600 - 300) / 10.f, (std::rand() % 600 - 300) / 10.f };
-    this->particles.push_back({ position, velocity, mass, acceleration, this->particlesVertexCount, this->collidersVertexCount });
+    this->particles.push_back({ position, velocity, mass, acceleration, this->particlesVertexCount });
 }
 
 void ParticleSystem::addParticle(sf::Vector2f position, sf::Vector2f velocity, float mass, sf::Vector2f acceleration)
 {
-    this->particles.push_back({ position, velocity, mass, acceleration, this->particlesVertexCount, this->collidersVertexCount });
+    this->particles.push_back({ position, velocity, mass, acceleration, this->particlesVertexCount });
 }
 
 void ParticleSystem::update(sf::Time deltaTime)

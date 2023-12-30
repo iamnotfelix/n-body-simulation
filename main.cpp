@@ -24,9 +24,8 @@ int main()
 
     // create the particle system
     ParticleSystem particleSystem;
-    particleSystem.setCollidersVertexCount(5);
     particleSystem.setParticlesVertexCount(15);
-    particleSystem.distributeParticles(150, 150);
+    particleSystem.distributeParticles(2000, 250);
 
     // create a clock to track the elapsed time
     sf::Clock clock;
@@ -46,9 +45,6 @@ int main()
                 sf::Vector2u size = window.getSize();
                 sf::View view(sf::Vector2f(0, 0), sf::Vector2f(size.x, size.y));
                 window.setView(view);
-
-                //sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
-                //window.setView(sf::View(visibleArea));
             }
             if (event.type == sf::Event::MouseButtonReleased)
             {
