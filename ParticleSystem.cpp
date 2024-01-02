@@ -251,3 +251,50 @@ void ParticleSystem::handleCollisions()
     // start broad phase
     this->collisionBroadPhase();
 }
+
+void ParticleSystem::update(sf::Time deltaTime, std::size_t nrThreads)
+{
+    std::vector<std::thread> threads;
+    std::vector<std::mutex> mutexes(this->particles.size());
+
+    const float magnitudeThreshold = 0.01f;
+    const float G = 1.f;
+    auto updateParticles = [&](std::size_t start, std::size_t end) {
+        for (std::size_t i = start; i < end; ++i)
+        {
+            sf::Vector2f pos1 = this->particles[i].getPosition();
+            float mass1 = this->particles[i].getMass();
+            sf::Vector2f acceleration{ 0.f, 0.f };
+            for (std::size_t j = i + 1; j < this->particles.size(); ++j)
+            {
+                sf::Vector2f pos2 = this->particles[j].getPosition();
+                float mass2 = this->particles[j].getMass();
+
+                sf::Vector2f diff = pos2 - pos1;
+                float magnitude_squared = diff.x * diff.x + diff.y * diff.y;
+                float magnitude = std::sqrtf(magnitude_squared);
+                sf::Vector2f tmp = G * diff / (std::max(magnitude_squared, magnitudeThreshold) * magnitude);
+
+                this->particles[i].setAcceleration(this->particles[i].getAcceleration() + mass2 * tmp);
+                {
+                    std::unique_lock<std::mutex> lock(mutexes[j]);
+                    this->particles[j].setAcceleration(this->particles[j].getAcceleration() - mass1 * tmp);
+                }
+            }
+        }
+    };
+
+    std::size_t batchSize = this->particles.size() / nrThreads;
+    for (std::size_t i = 0; i < nrThreads; ++i)
+    {
+        std::size_t start = i * batchSize;
+        std::size_t end = std::min((i + 1) * batchSize, this->particles.size());
+        threads.push_back(std::thread{ updateParticles, start, end });
+    }
+
+    for (std::size_t i = 0; i < nrThreads; ++i)
+        threads[i].join();
+
+    for (auto& particle : this->particles)
+        particle.move(deltaTime);
+}

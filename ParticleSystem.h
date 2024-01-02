@@ -2,11 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include <random>
 #include<vector>
-#include<set>
 #include <unordered_map>
-#include <unordered_set>
-#include <queue>
 #include <functional>
+#include <thread>
+#include <mutex>
 
 #include "Particle.h"
 
@@ -42,4 +41,5 @@ public:
     void update(sf::Time deltaTime);
     void handleCollisions();
 
+    void update(sf::Time deltaTime, std::size_t nrThreads);
 };

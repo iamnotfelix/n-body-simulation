@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <mpi.h>
 
 #include "ParticleSystem.h"
 
-#define particleCount 2000
+#define particleCount 5000
 
 std::string timeToString(sf::Time time)
 {
@@ -89,7 +90,8 @@ int main()
         particleSystem.handleCollisions();
         sf::Time collisionTime = clock.getElapsedTime();
 
-        particleSystem.update(elapsed);
+        //particleSystem.update(elapsed);
+        particleSystem.update(elapsed, 16);
         sf::Time physicsTime = clock.getElapsedTime() - collisionTime;
 
         // change performance text
@@ -101,7 +103,7 @@ int main()
         performanceString += "Particle count: " + std::to_string(particleSystem.getParticleCount());
 
         performance.setString(sf::String(performanceString));
-        
+
 
         // draw
         window.clear();
