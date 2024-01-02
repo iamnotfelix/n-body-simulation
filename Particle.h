@@ -11,16 +11,14 @@ private:
     sf::Vector2f acceleration;
     float mass;
 
+    bool isActive;
+
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     float calculateRadius(const float m) const;
 
 public:
     // TODO: make a color setter for particles
-    // TODO: create a flag that decides if collider is drawn or not 
-    // or maybe separate the colliders into a differet structure, 
-    // and assign them to particles using composition 
-    // => better separation and better for when multithreading will be implemented
 
     Particle();
     Particle(
@@ -35,13 +33,17 @@ public:
     sf::Vector2f getVelocity() const;
     float getMass() const;
     sf::Vector2f getAcceleration() const;
+    bool getIsActive() const;
 
+    float getRadius() const;
     sf::Vector2f getCenter() const;
+    sf::Vector2f getOXProjection() const;
 
     void setPosition(sf::Vector2f newPosition);
     void setVelocity(sf::Vector2f newVelocity);
     void setMass(float newMass);
     void setAcceleration(sf::Vector2f newAcceleration);
+    void setIsActive(const bool newState);
 
     void setParticleVertexCount(const std::size_t newCount);
 

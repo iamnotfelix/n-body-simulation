@@ -5,6 +5,8 @@
 #include<set>
 #include <unordered_map>
 #include <unordered_set>
+#include <queue>
+#include <functional>
 
 #include "Particle.h"
 
@@ -12,7 +14,6 @@ class ParticleSystem : public sf::Drawable, public sf::Transformable
 {
 private:
 
-    // TODO: add particle system bounds (after that also change the random position generated when adding particle)
     std::vector<Particle> particles;
     std::size_t particlesVertexCount;
 
@@ -21,12 +22,18 @@ private:
     // get rand float between 0 and 1
     static float randFloat();
 
+    void collisionBroadPhase();
+    void collisionNarrowPhase(std::vector<std::pair<Particle*, std::size_t>>& activeGroup);
+
 public:
 
     ParticleSystem();
 
+    std::size_t getParticleCount() const;
+
     void setParticlesVertexCount(const std::size_t newCount);
 
+    void distributeParticles(const std::size_t particleCount);
     void distributeParticles(const std::size_t particleCount, const float maxRadius);
 
     void addParticle(sf::Vector2f position, float mass, sf::Vector2f acceleration = { 0.f, 0.f });
